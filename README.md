@@ -35,6 +35,27 @@ faltavam - peguei de um repositório oficial do Google
 (`android/architecture-samples`) pra garantir que é uma versão
 confiável (Gradle 8.11.1).
 
+## 🎮 Telas novas: Elenco, Escalação e Táticas
+
+Construí baseado no **layout/conceito visual** que você mandou
+(imagens do Brasfoot) - mas **código 100% original**, sem usar nada
+do código decompilado. Adaptei pro futebol de cegos de verdade (sem
+posições como LAT/ZAG/MEI que não existem nesse esporte - é só
+goleiro + 4 de linha).
+
+- **Tela de Elenco** - jogadores agrupados (goleiros, depois linha),
+  overall, valor de mercado, indicador de titular
+- **Tela de Escalação** - duas colunas (titulares/disponíveis), toca
+  num jogador de cada lado pra trocar
+- **Tela de Táticas** - batedor de faltas, capitão, batedor de
+  escanteios, estilo de jogo, marcação, foco de ataque
+
+**A lógica por trás dessas telas foi testada de verdade** (compilada
+e executada, 10 testes novos: troca de escalação, formatação de
+valores, táticas manuais vs automáticas). **As telas em si (Compose)
+não consegui testar aqui** - só vão ser confirmadas quando o GitHub
+Actions rodar, ou quando você testar no celular.
+
 ## 💰 Mercado de transferências
 
 - Valor de mercado cresce de forma **não-linear** com o overall do
@@ -46,8 +67,8 @@ confiável (Gradle 8.11.1).
   fica sem goleiro, por exemplo)
 - Testado com 6 cenários: oferta boa (aceita), oferta baixa (recusada), comprador sem dinheiro (recusado), proteção do último goleiro, e ordenação do elenco por valor
 
-**Ainda falta**: uma tela (Compose) pra usar isso de verdade - hoje só
-existe a lógica testada, sem interface ainda.
+**Ainda falta**: uma tela (Compose) pra fazer ofertas de verdade pela
+interface - a lógica já está pronta e testada.
 
 ## Times reais, elencos com craques reais
 
@@ -86,12 +107,12 @@ Grupos reais:
 
 ## Próximos passos (ainda não construídos)
 
-- Tela do mercado de transferências (a lógica já está pronta e testada)
-- Escalação manual (hoje é só automática)
+- Tela pra fazer ofertas de mercado de transferências (lógica já pronta)
 - Fase eliminatória (quartas, semis, final) depois da fase de grupos
 - Persistência (salvar o progresso do campeonato)
 - Elenco completo dos outros 9 times (hoje só AGAFUC, Corinthians e
   APACE têm jogadores reais confirmados)
+- Tela de detalhe do jogador (ao tocar num jogador na lista do elenco)
 
 ## Como usar o GitHub Actions (recomendado, você já usa esse fluxo)
 
@@ -130,7 +151,10 @@ FutCegosManager/
 │       │       ├── Motor.kt          # TESTADO (compilado + executado)
 │       │       ├── Competicao.kt      # TESTADO (compilado + executado)
 │       │       ├── Mercado.kt           # TESTADO (compilado + executado)
-│       │       └── MainActivity.kt      # NÃO testado (precisa do SDK Android)
+│       │       ├── MainActivity.kt        # NÃO testado (Compose)
+│       │       ├── TelaElenco.kt            # NÃO testado (Compose)
+│       │       ├── TelaEscalacao.kt           # NÃO testado (Compose)
+│       │       └── TelaTaticas.kt               # NÃO testado (Compose)
 │       └── test/
 │           └── java/com/martim/futcegosmanager/
 │               ├── MotorTest.kt

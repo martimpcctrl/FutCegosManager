@@ -86,6 +86,62 @@ data class ResultadoPartida(
 
 const val DURACAO_TEMPO_MINUTOS = 20 // 2 tempos de 20 minutos, aproximado
 
+enum class EstiloDeJogo { EQUILIBRADO, ATAQUE_TOTAL, CONTRA_ATAQUE }
+enum class IntensidadeMarcacao { LEVE, PESADA, MUITO_PESADA }
+enum class FocoDeAtaque { PELO_MEIO, PELAS_LATERAIS }
+
+/** Configuração tática do time - quem bate falta/escanteio, quem é
+ * capitão, estilo de jogo. Separado do Time em si porque nem toda
+ * tela precisa disso (só a tela de táticas). */
+data class Taticas(
+    var titularesEscolhidosManualmente: MutableList<Jogador>? = null, // null = usa a escalação automática
+    var batedorFaltas: Jogador? = null,
+    var capitao: Jogador? = null,
+    var batedorEscanteios: Jogador? = null,
+    var estiloDeJogo: EstiloDeJogo = EstiloDeJogo.EQUILIBRADO,
+    var marcacao: IntensidadeMarcacao = IntensidadeMarcacao.PESADA,
+    var focoDeAtaque: FocoDeAtaque = FocoDeAtaque.PELO_MEIO,
+)
+
+/** Devolve os titulares considerando a escolha manual do técnico, se
+ * houver - senão cai pra escalação automática de sempre. */
+fun titularesEfetivos(time: Time, taticas: Taticas): List<Jogador> {
+    return taticas.titularesEscolhidosManualmente?.takeIf { it.isNotEmpty() } ?: time.escalacaoTitular()
+}
+
+/** Lógica pura de troca entre titular e disponível na tela de
+ * escalação - separada da UI de propósito, pra dar pra testar sem
+ * precisar do Compose. Devolve o novo par (titulares, disponíveis)
+ * depois da troca. Só troca entre lados diferentes (um titular por um
+ * disponível) - trocar dois do mesmo lado não faz sentido e não
+ * altera nada. */
+fun trocarJogadorNaEscalacao(
+    titulares: List<Jogador>,
+    disponiveis: List<Jogador>,
+    jogadorQueSai: Jogador,
+    jogadorQueEntra: Jogador,
+): Pair<List<Jogador>, List<Jogador>> {
+    val jogadorQueSaiEstaNosTitulares = titulares.contains(jogadorQueSai)
+    val jogadorQueEntraEstaNosTitulares = titulares.contains(jogadorQueEntra)
+
+    if (jogadorQueSaiEstaNosTitulares == jogadorQueEntraEstaNosTitulares) {
+        return titulares to disponiveis
+    }
+
+    val novosTitulares = titulares.toMutableList()
+    val novosDisponiveis = disponiveis.toMutableList()
+
+    if (jogadorQueSaiEstaNosTitulares) {
+        novosTitulares.remove(jogadorQueSai); novosTitulares.add(jogadorQueEntra)
+        novosDisponiveis.remove(jogadorQueEntra); novosDisponiveis.add(jogadorQueSai)
+    } else {
+        novosTitulares.remove(jogadorQueEntra); novosTitulares.add(jogadorQueSai)
+        novosDisponiveis.remove(jogadorQueSai); novosDisponiveis.add(jogadorQueEntra)
+    }
+
+    return novosTitulares to novosDisponiveis
+}
+
 private fun forcaParaProbabilidade(forcaTime: Double, forcaAdversario: Double): Double {
     val diferenca = forcaTime - forcaAdversario
     val base = 0.5 + (diferenca / 200)
